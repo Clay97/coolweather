@@ -1,5 +1,6 @@
 package com.example.coolweather;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.coolweather.gson.Hourly_forecast;
 import com.example.coolweather.gson.Weather;
+import com.example.coolweather.service.AutoUpdateService;
 import com.example.coolweather.util.HttpUtil;
 import com.example.coolweather.util.Utility;
 
@@ -133,6 +135,8 @@ public class WeatherActivity extends AppCompatActivity {
     *  根据天气id请求城市天气信息
     * */
     public void requestWeather(final String weatherid) {
+        mWeatherId =weatherid;
+
          String weatherUrl ="https://free-api.heweather.com/s6/weather/now?key=31df23e9439847e68a0382895d853f91&location=" +weatherid;
          String forecastUrl ="https://free-api.heweather.net/s6/weather/hourly?key=31df23e9439847e68a0382895d853f91&location="+weatherid;
 
@@ -239,5 +243,11 @@ public class WeatherActivity extends AppCompatActivity {
 
         }
         weatherLayout.setVisibility(View.VISIBLE);
+        if (hourly_forecast !=null &&  "ok".equals(hourly_forecast.status)){
+            Intent intent = new Intent(WeatherActivity.this, AutoUpdateService.class);
+            startService(intent);
+        }else {
+            Toast.makeText(WeatherActivity.this,"获取天气信息失败",Toast.LENGTH_SHORT).show();
+        }
     }
 }
